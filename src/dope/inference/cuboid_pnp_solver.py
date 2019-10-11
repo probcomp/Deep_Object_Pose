@@ -55,6 +55,10 @@ class CuboidPNPSolver(object):
                 pnp_algorithm = cv2.CV_ITERATIVE
             elif CuboidPNPSolver.cv2majorversion == 3:
                 pnp_algorithm = cv2.SOLVEPNP_ITERATIVE
+            elif CuboidPNPSolver.cv2majorversion == 4:
+                pnp_algorithm = cv2.SOLVEPNP_ITERATIVE
+            else:
+                raise Exception("Invalid OpenCV version")
                 # Alternative algorithms:
                 # pnp_algorithm = SOLVE_PNP_P3P  
                 # pnp_algorithm = SOLVE_PNP_EPNP        
