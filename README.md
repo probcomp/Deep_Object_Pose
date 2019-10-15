@@ -1,5 +1,22 @@
 [![License CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-blue.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode)
-![Python 2.7](https://img.shields.io/badge/python-2.7-green.svg)
+
+# Repackaging
+
+NOTE: This code has been modified to expose a simple Python package, without a dependence on ROS.
+The Python package (`dope`, defined in `setup.py`) exposes a simple API for detecting poses.
+
+To install:
+```
+pip install .
+```
+
+The entry point to this API is:
+```
+from dope.inference.api import Dope
+```
+
+For example usage see the `main()` function in `dope/inference/api.py`.
+
 # Deep Object Pose Estimation - ROS Inference
 
 This is the official DOPE ROS package for detection and 6-DoF pose estimation of **known objects** from an RGB camera.  The network has been trained on the following YCB objects:  cracker box, sugar box, tomato soup can, mustard bottle, potted meat can, and gelatin box.  For more details, see our [CoRL 2018 paper](https://arxiv.org/abs/1809.10790) and [video](https://youtu.be/yVGViBqWtBI).

@@ -16,11 +16,11 @@ import numpy as np
 import transforms3d as tf3d
 from PIL import Image
 from PIL import ImageDraw
-from cuboid import Cuboid3d
-from cuboid_pnp_solver import CuboidPNPSolver
-from detector import ModelData, ObjectDetector
 from yaml import load
 
+from .cuboid import Cuboid3d
+from .cuboid_pnp_solver import CuboidPNPSolver
+from .detector import ModelData, ObjectDetector
 
 class Draw(object):
     """Drawing helper class to visualize the neural network output"""
@@ -149,7 +149,7 @@ class Dope(object):
                     cuboid3d=Cuboid3d(self.params['dimensions'][model])
                 )
 
-    def __call__(self, img, camera_info):
+    def run(self, img, camera_info):
         """Image detector"""
 
         # Update camera matrix and distortion coefficients
@@ -259,7 +259,7 @@ def main():
     }
 
     detector = Dope("../../../config/config_pose.yaml")
-    out = detector(im, camera_info)
+    out = detector.run(im, camera_info)
     print(out)
 
 
