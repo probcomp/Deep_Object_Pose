@@ -127,7 +127,7 @@ class Dope(object):
                 M = np.array(self.params['model_transforms'][model], dtype='float64')
                 self.model_transforms[model] = tf3d.quaternions.mat2quat(M)
             except KeyError:
-                self.model_transforms[model] = np.array([0.0, 0.0, 0.0, 1.0], dtype='float64')
+                self.model_transforms[model] = np.array([1.0, 0.0, 0.0, 0.0], dtype='float64')
 
             try:
                 self.meshes[model] = self.params['meshes'][model]
@@ -196,10 +196,16 @@ class Dope(object):
                 if result["location"] is None:
                     continue
                 loc = result["location"]
-                ori = result["quaternion"]
+                ori = result["quaternion"][[3,0,1,2]]
 
-                # transform orientation
+                # apply model transformation
                 transformed_ori = tf3d.quaternions.qmult(ori, self.model_transforms[m])
+
+                # convert from DOPE world coordinate frame to our world coordinate frame
+                R13 = np.linalg.inv(tf3d.quaternions.quat2mat(transformed_ori))
+                R12 = np.array([[1, 0, 0], [0, -1, 0], [0, 0, -1]])
+                R23 = np.matmul(R13, np.linalg.inv(R12)) 
+                transformed_ori = tf3d.quaternions.mat2quat(np.linalg.inv(R23))
 
                 # rotate bbox dimensions if necessary
                 # (this only works properly if model_transform is in 90 degree angles)
@@ -211,11 +217,11 @@ class Dope(object):
                 x = loc[0] / CONVERT_SCALE_CM_TO_METERS
                 y = loc[1] / CONVERT_SCALE_CM_TO_METERS
                 z = loc[2] / CONVERT_SCALE_CM_TO_METERS
-                qw = transformed_ori[3]
-                qx = transformed_ori[0]
-                qy = transformed_ori[1]
-                qz = transformed_ori[2]
-                detection = np.array([x, y, z, qw, qx, qy, qz])
+                qw = transformed_ori[0]
+                qx = transformed_ori[1]
+                qy = transformed_ori[2]
+                qz = transformed_ori[3]
+                detection = np.array([x, -y, -z, qw, qx, qy, qz])
                 detection_array.append((m, detection))
 
                 # Draw the cube
@@ -225,7 +231,7 @@ class Dope(object):
                         points2d.append(tuple(pair))
                     draw.draw_cube(points2d, self.draw_colors[m])
 
-        if True:
+        if False:
             cv2.imshow("ImageWindow", np.array(im)[:,:,::-1])
             cv2.waitKey()
 
