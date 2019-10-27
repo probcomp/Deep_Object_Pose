@@ -7,10 +7,10 @@ downscale_height: 500      # if the input image is larger than this, scale it do
 # Comment any of these lines to prevent detection / pose estimation of that object
 # TODO: Make these paths non-absolute
 weights: {
-    "cracker":"../../../weights/cracker_60.pth",
+    "cracker":"../../weights/cracker_60.pth",
     # "gelatin":"package://dope/weights/gelatin_60.pth",
     # "meat":"package://dope/weights/meat_20.pth",
-    "mustard":"../../../weights/mustard_60.pth",
+    "mustard":"../../weights/mustard_60.pth",
     # "soup":"package://dope/weights/soup_60.pth",
     #"sugar":"package://dope/weights/sugar_60.pth"
     # "bleach":"package://dope/weights/bleach_28_dr.pth"

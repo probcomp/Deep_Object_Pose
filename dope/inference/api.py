@@ -10,6 +10,7 @@ listening to an image topic and publishing poses.
 """
 
 from __future__ import print_function
+import time
 
 import cv2
 import numpy as np
@@ -18,9 +19,9 @@ from PIL import Image
 from PIL import ImageDraw
 from yaml import load
 
-from .cuboid import Cuboid3d
-from .cuboid_pnp_solver import CuboidPNPSolver
-from .detector import ModelData, ObjectDetector
+from dope.inference.cuboid import Cuboid3d
+from dope.inference.cuboid_pnp_solver import CuboidPNPSolver
+from dope.inference.detector import ModelData, ObjectDetector
 
 class Draw(object):
     """Drawing helper class to visualize the neural network output"""
@@ -231,7 +232,7 @@ class Dope(object):
                         points2d.append(tuple(pair))
                     draw.draw_cube(points2d, self.draw_colors[m])
 
-        if False:
+        if True:
             cv2.imshow("ImageWindow", np.array(im)[:,:,::-1])
             cv2.waitKey()
 
@@ -264,8 +265,13 @@ def main():
         "P" : [FX, 0, PX, 0, 0, FY, PY, 0, 0, 0, 1, 0],
     }
 
-    detector = Dope("../../../config/config_pose.yaml")
+    t0 = time.time()
+    detector = Dope("../../config/config_pose.yaml")
+    t1 = time.time()
     out = detector.run(im, camera_info)
+    t2 = time.time()
+    print("detection time: %.4f seconds" % (t2 - t1))
+    print("total time: %.4f seconds" % (t2 - t0))
     print(out)
 
 
