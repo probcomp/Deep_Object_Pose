@@ -176,10 +176,9 @@ class Dope(object):
             self.pnp_solvers[m].set_camera_intrinsic_matrix(camera_matrix)
             self.pnp_solvers[m].set_dist_coeffs(dist_coeffs)
 
-        # Copy and draw image
+        # Copy image
         img_copy = img.copy()
         im = Image.fromarray(img_copy)
-        draw = Draw(im)
 
         detection_array = []
 
@@ -197,44 +196,16 @@ class Dope(object):
                 if result["location"] is None:
                     continue
                 loc = result["location"]
-                ori = result["quaternion"][[3,0,1,2]]
+                (qw, qx, qy, qz) = result["quaternion"][[3,0,1,2]]
 
                 # apply model transformation
-                transformed_ori = tf3d.quaternions.qmult(ori, self.model_transforms[m])
-
-                # convert from DOPE world coordinate frame to our world coordinate frame
-                R13 = np.linalg.inv(tf3d.quaternions.quat2mat(transformed_ori))
-                R12 = np.array([[1, 0, 0], [0, -1, 0], [0, 0, -1]])
-                R23 = np.matmul(R13, np.linalg.inv(R12)) 
-                transformed_ori = tf3d.quaternions.mat2quat(np.linalg.inv(R23))
-
-                # rotate bbox dimensions if necessary
-                # (this only works properly if model_transform is in 90 degree angles)
-                dims = rotate_vector(vector=self.dimensions[m], quaternion=self.model_transforms[m])
-                dims = np.absolute(dims)
-                dims = tuple(dims)
 
                 CONVERT_SCALE_CM_TO_METERS = 100
                 x = loc[0] / CONVERT_SCALE_CM_TO_METERS
                 y = loc[1] / CONVERT_SCALE_CM_TO_METERS
                 z = loc[2] / CONVERT_SCALE_CM_TO_METERS
-                qw = transformed_ori[0]
-                qx = transformed_ori[1]
-                qy = transformed_ori[2]
-                qz = transformed_ori[3]
-                detection = np.array([x, -y, -z, qw, qx, qy, qz])
+                detection = np.array([x, y, z, qw, qx, qy, qz])
                 detection_array.append((m, detection))
-
-                # Draw the cube
-                if None not in result['projected_points']:
-                    points2d = []
-                    for pair in result['projected_points']:
-                        points2d.append(tuple(pair))
-                    draw.draw_cube(points2d, self.draw_colors[m])
-
-        if True:
-            cv2.imshow("ImageWindow", np.array(im)[:,:,::-1])
-            cv2.waitKey()
 
         return detection_array
 
